@@ -772,6 +772,18 @@ function renderQuestion(){
   const end=el('#endtest'); if(end) end.onclick=confirmEndTest;
 }
 
+// Send the given question ids into Practice as a fresh "to study" pile.
+function studyMissed(ids){
+  if(!ids||!ids.length) return;
+  lastTestResult=null;
+  if(mode!=='pool') setMode('pool',true);   // build/keep the deck, switch to Practice
+  if(!deck) buildDeck();
+  ids.forEach(id=>{ delete view[id]; });     // clear so they count as unanswered again
+  deckDone=false;
+  idx=Math.max(0, deck.indexOf(ids[0]));
+  render();
+}
+
 // Shown when every card in the Practice deck has been answered.
 function renderDeckComplete(){
   const correct=deck.filter(id=>view[id]&&view[id].result==='correct').length;
@@ -790,12 +802,7 @@ function renderDeckComplete(){
     '</div>';
   el('#reshuffle').onclick=()=>{ buildDeck(); render(); };
   const rm=el('#reviewmissed');
-  if(rm) rm.onclick=()=>{
-    const first=deck.find(id=>view[id]&&view[id].result==='incorrect');
-    deckDone=false;
-    idx=Math.max(0, deck.indexOf(first));
-    tryAgain(byId[first]);   // clears its state so it re-enters the unanswered pile
-  };
+  if(rm) rm.onclick=()=>studyMissed(deck.filter(id=>view[id]&&view[id].result==='incorrect'));
 }
 
 function navHTML(list,q,result){
@@ -905,7 +912,7 @@ function renderTestResult(){
     '</div>';
   el('#again').onclick=()=>{ lastTestResult=null; render(); };
   const rm=el('#reviewmissed');
-  if(rm) rm.onclick=()=>{ lastTestResult=null; jumpTo(r.missedIds[0]); };
+  if(rm) rm.onclick=()=>studyMissed(r.missedIds);
 }
 
 /* ============================================================
@@ -1043,6 +1050,7 @@ el('#reset').onclick=()=>{
 el('#jump-review').onclick=()=>{
   const rev=QUESTIONS.map(q=>q.i).filter(i=>status[i]==='review');
   if(!rev.length){ el('#panel-sub').textContent='Nothing in the review pile yet.'; return; }
+  if(mode!=='pool') setMode('pool',true);   // leave History/Test (test stays resumable) so the jump lands
   jumpTo(rev[0]);
 };
 
