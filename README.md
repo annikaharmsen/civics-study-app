@@ -15,12 +15,14 @@ across sessions.
   (D.C., U.S.), and number words vs. digits (`nine` ↔ `9`, `fourteenth` ↔ `14th`).
   "Name two/three/five…" questions require that many *distinct* correct answers. You can always
   override the grade yourself.
-- **Four modes**
-  - **Practice** — the full 128-question pool, jump anywhere.
-  - **Rotation** — the pool split into 7 manageable rounds.
-  - **Test** — a scored exam: a random **20-question** subset (pass = 12/20, like the real
-    interview) or the **full 128** (pass = 60%). Interrupted tests are **saved and resumable**.
+- **Three modes**
+  - **Practice** — all 128 questions as a single shuffled deck. Work through every card once,
+    then a summary shows your correct/incorrect tally and offers a fresh reshuffle.
+  - **Test** — a scored exam: a **20-question** subset (pass = 12/20, like the real interview) or
+    the **full 128** (pass = 60%). Interrupted tests are **saved and resumable**.
   - **History** — lifetime accuracy, questions seen, and a log of past test scores.
+- **Smart shuffling** — the deck and test draws are weighted toward questions you've practiced
+  **least recently** or marked **needs review**, so weak spots come up more often.
 - **Persistent** — all progress is stored in `localStorage`; close the tab and pick up later.
 - **Self-contained** — one `index.html`, no build step, no dependencies, works offline.
 
