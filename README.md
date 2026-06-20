@@ -12,7 +12,8 @@ across sessions.
 
 - **Type-then-check flow** — answer in your own words before the official answer is revealed.
 - **Auto-grading** — fuzzy matching that handles parenthetical phrasing, abbreviations
-  (D.C., U.S.), and number words vs. digits (`nine` ↔ `9`, `fourteenth` ↔ `14th`). You can always
+  (D.C., U.S.), and number words vs. digits (`nine` ↔ `9`, `fourteenth` ↔ `14th`).
+  "Name two/three/five…" questions require that many *distinct* correct answers. You can always
   override the grade yourself.
 - **Four modes**
   - **Practice** — the full 128-question pool, jump anywhere.
@@ -30,8 +31,8 @@ Everything lives under a single versioned `localStorage` key (`civics128:v1`):
 | Field        | Purpose |
 |--------------|---------|
 | `status`     | Latest result per question (drives the board + stats). |
-| `attempts`   | Append-only log of every answer: `{ id, ts, answer, auto, result, test }`. `answer === ""` means skipped; `result !== auto` means you overrode the auto-grade. Capped to the most recent 2,000. |
-| `tests`      | One record per completed scored test: `{ id, ts, size, correct, total, passed }`. |
+| `attempts`   | Append-only log of every answer: `{ id, ts, answer, auto, result, test }`. `answer === ""` means skipped; `result !== auto` means you overrode the auto-grade; `test` links the attempt to a scored test (else `null`). Capped to the most recent 2,000. |
+| `tests`      | One record per completed scored test: `{ id, ts, total, correct, score }`. Pass/fail is computed from the threshold, not stored; the test's questions are derivable from `attempts` (`test === id`). |
 | `activeTest` | The in-progress test, if any — saved after every answer so it can be resumed. |
 
 If `localStorage` is unavailable (e.g. private browsing), the app degrades gracefully to
