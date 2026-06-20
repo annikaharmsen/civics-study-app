@@ -366,6 +366,23 @@ const SENATORS={
   WI:[["Tammy Baldwin","Baldwin"],["Ron Johnson","Johnson"]],
   WY:[["John Barrasso","Barrasso"],["Cynthia M. Lummis","Lummis"]]
 };
+// Q61: each state's governor, as [full name, last name]. States not listed
+// fall back to self-grading (no data yet).
+const GOVERNORS={
+  AL:["Kay Ivey","Ivey"], AK:["Mike Dunleavy","Dunleavy"], AZ:["Katie Hobbs","Hobbs"],
+  CA:["Gavin Newsom","Newsom"], CO:["Jared Polis","Polis"], CT:["Ned Lamont","Lamont"],
+  FL:["Ron DeSantis","DeSantis"], GA:["Brian Kemp","Kemp"], HI:["Josh Green","Green"],
+  IL:["JB Pritzker","Pritzker"], IN:["Mike Braun","Braun"], IA:["Kim Reynolds","Reynolds"],
+  KY:["Andy Beshear","Beshear"], LA:["Jeff Landry","Landry"], ME:["Janet Mills","Mills"],
+  MA:["Maura Healey","Healey"], MI:["Gretchen Whitmer","Whitmer"], MN:["Tim Walz","Walz"],
+  MO:["Mike Kehoe","Kehoe"], MT:["Greg Gianforte","Gianforte"], NE:["Jim Pillen","Pillen"],
+  NH:["Kelly Ayotte","Ayotte"], NJ:["Mikie Sherrill","Sherrill"], NM:["Michelle Lujan Grisham","Lujan Grisham"],
+  NC:["Josh Stein","Stein"], ND:["Kelly Armstrong","Armstrong"], OH:["Mike DeWine","DeWine"],
+  OR:["Tina Kotek","Kotek"], PA:["Josh Shapiro","Shapiro"], RI:["Dan McKee","McKee"],
+  SD:["Larry Rhoden","Rhoden"], TN:["Bill Lee","Lee"], TX:["Greg Abbott","Abbott"],
+  VT:["Phil Scott","Scott"], VA:["Abigail Spanberger","Spanberger"], WA:["Bob Ferguson","Ferguson"],
+  WI:["Tony Evers","Evers"], WY:["Mark Gordon","Gordon"]
+};
 const STATES=[["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],
   ["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","District of Columbia"],["FL","Florida"],
   ["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],
@@ -387,6 +404,10 @@ function effectiveQ(q){
     const sens=SENATORS[store.state];
     const grade=[]; sens.forEach(s=>{ grade.push(s[0]); grade.push(s[1]); });   // full + last name
     return Object.assign({}, q, {a:grade, need:1, _dynamic:true, _display:sens.map(s=>s[0])});
+  }
+  if(q.i===61 && GOVERNORS[store.state]){
+    const g=GOVERNORS[store.state];
+    return Object.assign({}, q, {a:[g[0],g[1]], need:1, _dynamic:true, _display:[g[0]]});
   }
   return q;
 }
@@ -656,16 +677,20 @@ function renderQuestion(){
   let answersHTML='';
   if(revealed){
     if(vary){
-      if(q.i===23){
+      const stateQ=(q.i===23||q.i===61);
+      if(stateQ && !store.state){
+        const what = q.i===23 ? 'your U.S. senator' : 'your governor';
         answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
-          '<div class="note"><b>This one is your U.S. senator.</b> Pick your state and we’ll grade it for you:</div>'+
+          '<div class="note"><b>This one depends on your state — it’s '+what+'.</b> Pick your state and we’ll grade it for you:</div>'+
           '<div class="cardstate"><select id="state-sel-card" aria-label="Your state">'+stateOptions(store.state)+'</select></div></div>';
       }else{
+        const noData = (stateQ && store.state) ? ' We don’t have this for '+escapeHtml(stateName(store.state))+' yet — grade yourself.' : '';
         answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
-          '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+'</div></div>';
+          '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+noData+'</div></div>';
       }
     }else if(q._dynamic){
-      const ahead = q.i===23 ? 'Your state’s senators &middot; name either one' : 'Answer';
+      const ahead = q.i===23 ? 'Your state’s senators &middot; name either one'
+        : q.i===61 ? 'Your governor' : 'Answer';
       answersHTML='<div class="answers"><div class="ahead">'+ahead+'</div><ul>'+
         q._display.map(a=>'<li class="oneof">'+escapeHtml(a)+'</li>').join('')+'</ul></div>';
     }else{
@@ -984,7 +1009,7 @@ function toggleStatePop(open){
 }
 function setUserState(code){
   store.state=code;
-  delete view[23];            // re-answer Q23 against the new state
+  delete view[23]; delete view[61];   // re-answer state-dependent questions
   const sel=el('#state-sel'); if(sel) sel.value=code;
   saveStore();
   refreshStateBtn();
