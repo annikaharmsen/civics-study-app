@@ -142,6 +142,11 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 .legend i.c{background:var(--green);border-color:var(--green)}
 .legend i.r{background:var(--clay);border-color:var(--clay)}
 .legend i.u{background:#faf8f3}
+.statecfg{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.statecfg label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:7px}
+.statecfg select{width:100%;font-family:Inter,system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1.5px solid var(--line-strong);border-radius:9px;padding:9px 11px;cursor:pointer}
+.statecfg select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-tint)}
+.statecfg .hint{font-size:11.5px;color:var(--ink-soft);text-align:left}
 .panelfoot{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .linkbtn{font-size:12.5px;color:var(--clay);background:none;border:0;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
 .linkbtn.blue{color:var(--blue)}
@@ -249,6 +254,11 @@ footer a{color:var(--blue)}
         <span><i class="r"></i>Review</span>
         <span><i class="u"></i>Not yet</span>
       </div>
+      <div class="statecfg">
+        <label for="state-sel">Your state</label>
+        <select id="state-sel" aria-label="Your state, for the senator question (Q23)"></select>
+        <div class="hint" style="margin:7px 0 0">Lets us auto-grade “name your U.S. senator.”</div>
+      </div>
       <div class="panelfoot">
         <button class="linkbtn blue" id="jump-review">Study review pile</button>
         <button class="linkbtn" id="reset">Reset all</button>
@@ -274,13 +284,100 @@ const NEED={10:2,48:2,65:3,67:2,69:2,81:5,126:3};
 QUESTIONS.forEach(q=>{ if(NEED[q.i]) q.need=NEED[q.i]; });
 
 /* ============================================================
+   Dynamic answers — questions whose answer depends on who/where
+   ============================================================ */
+// Current national office-holders (update here when they change).
+// First entry is the display answer; the rest are extra accepted forms.
+const OFFICIALS={
+  38:["Donald J. Trump","Trump"],          // President
+  39:["James David Vance","JD Vance","Vance"]  // Vice President
+};
+// Q23: each state's two U.S. senators, as [full name, last name].
+const SENATORS={
+  AL:[["Katie Boyd Britt","Britt"],["Tommy Tuberville","Tuberville"]],
+  AK:[["Lisa Murkowski","Murkowski"],["Dan Sullivan","Sullivan"]],
+  AZ:[["Ruben Gallego","Gallego"],["Mark Kelly","Kelly"]],
+  AR:[["John Boozman","Boozman"],["Tom Cotton","Cotton"]],
+  CA:[["Alex Padilla","Padilla"],["Adam B. Schiff","Schiff"]],
+  CO:[["Michael F. Bennet","Bennet"],["John W. Hickenlooper","Hickenlooper"]],
+  CT:[["Richard Blumenthal","Blumenthal"],["Christopher Murphy","Murphy"]],
+  DE:[["Lisa Blunt Rochester","Blunt Rochester"],["Christopher A. Coons","Coons"]],
+  FL:[["Ashley Moody","Moody"],["Rick Scott","Scott"]],
+  GA:[["Jon Ossoff","Ossoff"],["Raphael G. Warnock","Warnock"]],
+  HI:[["Mazie K. Hirono","Hirono"],["Brian Schatz","Schatz"]],
+  ID:[["Mike Crapo","Crapo"],["James E. Risch","Risch"]],
+  IL:[["Tammy Duckworth","Duckworth"],["Richard J. Durbin","Durbin"]],
+  IN:[["Jim Banks","Banks"],["Todd Young","Young"]],
+  IA:[["Joni Ernst","Ernst"],["Chuck Grassley","Grassley"]],
+  KS:[["Roger Marshall","Marshall"],["Jerry Moran","Moran"]],
+  KY:[["Mitch McConnell","McConnell"],["Rand Paul","Paul"]],
+  LA:[["Bill Cassidy","Cassidy"],["John Kennedy","Kennedy"]],
+  ME:[["Susan M. Collins","Collins"],["Angus King","King"]],
+  MD:[["Angela D. Alsobrooks","Alsobrooks"],["Chris Van Hollen","Van Hollen"]],
+  MA:[["Edward J. Markey","Markey"],["Elizabeth Warren","Warren"]],
+  MI:[["Gary C. Peters","Peters"],["Elissa Slotkin","Slotkin"]],
+  MN:[["Amy Klobuchar","Klobuchar"],["Tina Smith","Smith"]],
+  MS:[["Cindy Hyde-Smith","Hyde-Smith"],["Roger F. Wicker","Wicker"]],
+  MO:[["Josh Hawley","Hawley"],["Eric Schmitt","Schmitt"]],
+  MT:[["Steve Daines","Daines"],["Tim Sheehy","Sheehy"]],
+  NE:[["Deb Fischer","Fischer"],["Pete Ricketts","Ricketts"]],
+  NV:[["Catherine Cortez Masto","Cortez Masto"],["Jacky Rosen","Rosen"]],
+  NH:[["Margaret Wood Hassan","Hassan"],["Jeanne Shaheen","Shaheen"]],
+  NJ:[["Cory A. Booker","Booker"],["Andy Kim","Kim"]],
+  NM:[["Martin Heinrich","Heinrich"],["Ben Ray Luján","Luján"]],
+  NY:[["Kirsten E. Gillibrand","Gillibrand"],["Charles E. Schumer","Schumer"]],
+  NC:[["Ted Budd","Budd"],["Thom Tillis","Tillis"]],
+  ND:[["Kevin Cramer","Cramer"],["John Hoeven","Hoeven"]],
+  OH:[["Jon Husted","Husted"],["Bernie Moreno","Moreno"]],
+  OK:[["Alan Armstrong","Armstrong"],["James Lankford","Lankford"]],
+  OR:[["Jeff Merkley","Merkley"],["Ron Wyden","Wyden"]],
+  PA:[["John Fetterman","Fetterman"],["David McCormick","McCormick"]],
+  RI:[["Jack Reed","Reed"],["Sheldon Whitehouse","Whitehouse"]],
+  SC:[["Lindsey Graham","Graham"],["Tim Scott","Scott"]],
+  SD:[["Mike Rounds","Rounds"],["John Thune","Thune"]],
+  TN:[["Marsha Blackburn","Blackburn"],["Bill Hagerty","Hagerty"]],
+  TX:[["John Cornyn","Cornyn"],["Ted Cruz","Cruz"]],
+  UT:[["John R. Curtis","Curtis"],["Mike Lee","Lee"]],
+  VT:[["Bernard Sanders","Sanders"],["Peter Welch","Welch"]],
+  VA:[["Tim Kaine","Kaine"],["Mark R. Warner","Warner"]],
+  WA:[["Maria Cantwell","Cantwell"],["Patty Murray","Murray"]],
+  WV:[["Shelley Moore Capito","Capito"],["James C. Justice","Justice"]],
+  WI:[["Tammy Baldwin","Baldwin"],["Ron Johnson","Johnson"]],
+  WY:[["John Barrasso","Barrasso"],["Cynthia M. Lummis","Lummis"]]
+};
+const STATES=[["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],
+  ["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","District of Columbia"],["FL","Florida"],
+  ["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],
+  ["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],["MA","Massachusetts"],
+  ["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],["MT","Montana"],["NE","Nebraska"],
+  ["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],["NM","New Mexico"],["NY","New York"],
+  ["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregon"],
+  ["PA","Pennsylvania"],["RI","Rhode Island"],["SC","South Carolina"],["SD","South Dakota"],["TN","Tennessee"],
+  ["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],
+  ["WI","Wisconsin"],["WY","Wyoming"]];
+
+// Returns the question, with dynamic answers substituted in when we know them.
+function effectiveQ(q){
+  if(OFFICIALS[q.i]){
+    const names=OFFICIALS[q.i];
+    return Object.assign({}, q, {a:names, need:1, _dynamic:true, _display:[names[0]]});
+  }
+  if(q.i===23 && SENATORS[store.state]){
+    const sens=SENATORS[store.state];
+    const grade=[]; sens.forEach(s=>{ grade.push(s[0]); grade.push(s[1]); });   // full + last name
+    return Object.assign({}, q, {a:grade, need:1, _dynamic:true, _display:sens.map(s=>s[0])});
+  }
+  return q;
+}
+
+/* ============================================================
    Persistence layer — everything kept under one versioned key
    ============================================================ */
 const STORAGE_KEY='civics128:v1';
 const ATTEMPT_CAP=2000;
 let memoryOnly=false;
 
-function freshStore(){ return {status:{}, attempts:[], tests:[], activeTest:null}; }
+function freshStore(){ return {status:{}, attempts:[], tests:[], activeTest:null, state:''}; }
 function loadStore(){
   try{
     const raw=localStorage.getItem(STORAGE_KEY);
@@ -290,7 +387,8 @@ function loadStore(){
         status:(o&&o.status)||{},
         attempts:Array.isArray(o&&o.attempts)?o.attempts:[],
         tests:Array.isArray(o&&o.tests)?o.tests:[],
-        activeTest:(o&&o.activeTest)||null
+        activeTest:(o&&o.activeTest)||null,
+        state:(o&&o.state)||''
       };
     }
   }catch(e){ /* corrupt or unavailable */ }
@@ -316,7 +414,8 @@ const NUMWORD={one:"1",two:"2",three:"3",four:"4",five:"5",six:"6",seven:"7",eig
   eleventh:"11",twelfth:"12",thirteenth:"13",fourteenth:"14",fifteenth:"15",sixteenth:"16",seventeenth:"17",
   eighteenth:"18",nineteenth:"19",twentieth:"20",thirtieth:"30"};
 function norm(s){
-  let t=String(s).toLowerCase()
+  let t=String(s).normalize('NFD').replace(/[̀-ͯ]/g,'')   // strip accents: Luján -> Lujan
+    .toLowerCase()
     .replace(/[‘’“”]/g,"'")
     .replace(/[^a-z0-9 ]+/g,' ')
     .replace(/(\d+)(st|nd|rd|th)\b/g,'$1')                  // 14th -> 14
@@ -458,6 +557,7 @@ function applyResult(id,result){
 }
 // User submits a typed answer. An empty answer counts as "skipped".
 function submitAnswer(q,text){
+  q=effectiveQ(q);                                    // resolve dynamic answers (senators, President)
   const skipped = text==='';
   const vary=isVary(q);
   let auto, hits=[], result;
@@ -523,7 +623,7 @@ function updatePanelSub(){
 
 function renderQuestion(){
   const list=activeList();
-  const q=byId[list[idx]];
+  const q=effectiveQ(byId[list[idx]]);    // dynamic answers (senators, President) resolved
   const card=el('#card');
   const vary=isVary(q);
   const s=statesMap()[q.i];          // answered state, if any
@@ -535,8 +635,13 @@ function renderQuestion(){
   let answersHTML='';
   if(revealed){
     if(vary){
+      const extra = q.i===23 ? ' <b>Set your state</b> in the sidebar to auto-grade this.' : '';
       answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
-        '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+'</div></div>';
+        '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+extra+'</div></div>';
+    }else if(q._dynamic){
+      const ahead = q.i===23 ? 'Your state’s senators &middot; name either one' : 'Answer';
+      answersHTML='<div class="answers"><div class="ahead">'+ahead+'</div><ul>'+
+        q._display.map(a=>'<li class="oneof">'+escapeHtml(a)+'</li>').join('')+'</ul></div>';
     }else{
       const ahead = q.need>1 ? ('Acceptable answers &middot; name any '+q.need)
         : (oneOf?'Acceptable answers &middot; give as many as the question asks':'Answer');
@@ -830,6 +935,16 @@ function setMode(m,silent){
   render();
 }
 document.querySelectorAll('.modes button').forEach(b=>{ b.onclick=()=>setMode(b.dataset.mode); });
+
+// State selector — drives auto-grading of Q23 (your U.S. senators).
+(function buildStateSelect(){
+  const sel=el('#state-sel'); if(!sel) return;
+  let html='<option value="">— Select your state —</option>';
+  for(const [code,name] of STATES) html+='<option value="'+code+'">'+name+'</option>';
+  sel.innerHTML=html;
+  sel.value=store.state||'';
+  sel.onchange=()=>{ store.state=sel.value; saveStore(); render(); };
+})();
 
 el('#reset').onclick=()=>{
   if(!confirm('Reset everything — board progress, all answer history, test scores and any test in progress? This cannot be undone.')) return;

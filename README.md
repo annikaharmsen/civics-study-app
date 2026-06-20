@@ -23,6 +23,9 @@ across sessions.
   - **History** — lifetime accuracy, questions seen, and a log of past test scores.
 - **Smart shuffling** — the deck and test draws are weighted toward questions you've practiced
   **least recently** or marked **needs review**, so weak spots come up more often.
+- **Location-aware grading** — pick **your state** in the sidebar and the "name your U.S. senator"
+  question (Q23) is auto-graded against that state's actual senators (full name or last name).
+  Current national office-holders (President, Vice President) are graded too.
 - **Persistent** — all progress is stored in `localStorage`; close the tab and pick up later.
 - **Self-contained** — one `index.html`, no build step, no dependencies, works offline.
 
@@ -36,6 +39,10 @@ Everything lives under a single versioned `localStorage` key (`civics128:v1`):
 | `attempts`   | Append-only log of every answer: `{ id, ts, answer, auto, result, test }`. `answer === ""` means skipped; `result !== auto` means you overrode the auto-grade; `test` links the attempt to a scored test (else `null`). Capped to the most recent 2,000. |
 | `tests`      | One record per completed scored test: `{ id, ts, total, correct, score }`. Pass/fail is computed from the threshold, not stored; the test's questions are derivable from `attempts` (`test === id`). |
 | `activeTest` | The in-progress test, if any — saved after every answer so it can be resumed. |
+| `state`      | Your selected state (2-letter code), used to auto-grade the senator question. |
+
+Current senators are bundled in the app; national office-holders (President/Vice President) live in
+a small `OFFICIALS` map near the top of the script — update it there when they change.
 
 If `localStorage` is unavailable (e.g. private browsing), the app degrades gracefully to
 in-memory progress for the session.
