@@ -188,11 +188,6 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 /* History */
 .hist{animation:rise .24s ease}
 .hist h2{font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 14px}
-.hsum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-@media(max-width:560px){.hsum{grid-template-columns:repeat(2,1fr)}}
-.hsum .box{background:#fbf9f4;border:1px solid var(--line);border-radius:11px;padding:12px 13px}
-.hsum .box .n{font-family:'Space Grotesk';font-weight:600;font-size:22px}
-.hsum .box .l{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-top:2px}
 .hsec{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin:18px 0 10px}
 .tlist{display:flex;flex-direction:column;gap:8px}
 .trow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
@@ -926,19 +921,8 @@ function fmtDate(ts){
 function renderHistory(){
   const card=el('#card'); card.className='card';
   const attempts=store.attempts, tests=store.tests.slice().sort((a,b)=>b.ts-a.ts);
-  const graded=attempts.filter(a=>a.result==='correct'||a.result==='incorrect');
-  const correct=graded.filter(a=>a.result==='correct').length;
-  const acc=graded.length?Math.round(correct/graded.length*100)+'%':'—';
-  const seen=new Set(attempts.map(a=>a.id)).size;
-  const passed=tests.filter(t=>t.correct>=passNeeded(t.total)).length;
 
-  let html='<div class="hist"><h2>Study history</h2>'+
-    '<div class="hsum">'+
-      '<div class="box"><div class="n">'+graded.length+'</div><div class="l">Answers graded</div></div>'+
-      '<div class="box"><div class="n">'+acc+'</div><div class="l">Overall accuracy</div></div>'+
-      '<div class="box"><div class="n">'+seen+'<small style="font-size:13px;color:var(--ink-soft)"> /128</small></div><div class="l">Questions seen</div></div>'+
-      '<div class="box"><div class="n">'+passed+'<small style="font-size:13px;color:var(--ink-soft)"> /'+tests.length+'</small></div><div class="l">Tests passed</div></div>'+
-    '</div>';
+  let html='<div class="hist"><h2>Study history</h2>';
 
   // Tests
   html+='<div class="hsec">Scored tests</div>';
