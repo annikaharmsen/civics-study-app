@@ -23,9 +23,10 @@ across sessions.
   - **History** — lifetime accuracy, questions seen, and a log of past test scores.
 - **Smart shuffling** — the deck and test draws are weighted toward questions you've practiced
   **least recently** or marked **needs review**, so weak spots come up more often.
-- **Location-aware grading** — pick **your state** in the sidebar and the "name your U.S. senator"
-  question (Q23) is auto-graded against that state's actual senators (full name or last name).
-  Current national office-holders (President, Vice President) are graded too.
+- **Location-aware grading** — set **your state** from the button in the top-right (or right on the
+  Q23 card) and "name your U.S. senator" is auto-graded against that state's actual senators (full
+  name or last name). Current national office-holders (President, Vice President, Chief Justice) are
+  graded too. The same state setting is ready to drive future state questions (governor, capital).
 - **Persistent** — all progress is stored in `localStorage`; close the tab and pick up later.
 - **Self-contained** — one `index.html`, no build step, no dependencies, works offline.
 

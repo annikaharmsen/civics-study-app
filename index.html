@@ -142,11 +142,22 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 .legend i.c{background:var(--green);border-color:var(--green)}
 .legend i.r{background:var(--clay);border-color:var(--clay)}
 .legend i.u{background:#faf8f3}
-.statecfg{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
-.statecfg label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:7px}
-.statecfg select{width:100%;font-family:Inter,system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1.5px solid var(--line-strong);border-radius:9px;padding:9px 11px;cursor:pointer}
-.statecfg select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-tint)}
-.statecfg .hint{font-size:11.5px;color:var(--ink-soft);text-align:left}
+/* State config — top-right button + popover */
+.topright{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.statewrap{position:relative}
+.statebtn{display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:999px;padding:7px 13px;cursor:pointer;transition:.15s}
+.statebtn:hover{border-color:var(--blue);color:var(--blue)}
+.statebtn svg:first-child{color:var(--clay)}
+.statebtn.set svg:first-child{color:var(--green)}
+.statepop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:250px;background:#fff;border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 8px 30px rgba(22,36,59,.16);padding:14px}
+.statepop[hidden]{display:none}
+.statepop label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:7px}
+.statepop select{width:100%;font-family:Inter,system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1.5px solid var(--line-strong);border-radius:9px;padding:9px 11px;cursor:pointer}
+.statepop select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-tint)}
+.pop-hint{font-size:11.5px;color:var(--ink-soft);margin-top:9px;line-height:1.4}
+.cardstate{margin-top:12px}
+.cardstate select{width:100%;max-width:340px;font-family:Inter,system-ui,sans-serif;font-size:15px;color:var(--ink);background:#fff;border:1.5px solid var(--blue);border-radius:10px;padding:11px 13px;cursor:pointer}
+.cardstate select:focus{outline:none;box-shadow:0 0 0 3px var(--blue-tint)}
 .panelfoot{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .linkbtn{font-size:12.5px;color:var(--clay);background:none;border:0;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
 .linkbtn.blue{color:var(--blue)}
@@ -222,7 +233,21 @@ footer a{color:var(--blue)}
         <p>2025 USCIS Naturalization Civics Test &middot; type your answer, get graded, track your progress</p>
       </div>
     </div>
-    <div class="passchip"><span>20 questions asked</span><i class="dot"></i><span><b>12 correct</b> to pass</span></div>
+    <div class="topright">
+      <div class="statewrap">
+        <button class="statebtn" id="state-btn" aria-haspopup="true" aria-expanded="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <span id="state-btn-label">Set your state</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="statepop" id="state-pop" hidden>
+          <label for="state-sel">Your state or territory</label>
+          <select id="state-sel"></select>
+          <div class="pop-hint">Used to grade questions about your state — like “name your U.S. senator.”</div>
+        </div>
+      </div>
+      <div class="passchip"><span>20 questions asked</span><i class="dot"></i><span><b>12 correct</b> to pass</span></div>
+    </div>
   </header>
 
   <div class="stats">
@@ -253,11 +278,6 @@ footer a{color:var(--blue)}
         <span><i class="c"></i>Correct</span>
         <span><i class="r"></i>Review</span>
         <span><i class="u"></i>Not yet</span>
-      </div>
-      <div class="statecfg">
-        <label for="state-sel">Your state</label>
-        <select id="state-sel" aria-label="Your state, for the senator question (Q23)"></select>
-        <div class="hint" style="margin:7px 0 0">Lets us auto-grade “name your U.S. senator.”</div>
       </div>
       <div class="panelfoot">
         <button class="linkbtn blue" id="jump-review">Study review pile</button>
@@ -636,9 +656,14 @@ function renderQuestion(){
   let answersHTML='';
   if(revealed){
     if(vary){
-      const extra = q.i===23 ? ' <b>Set your state</b> in the sidebar to auto-grade this.' : '';
-      answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
-        '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+extra+'</div></div>';
+      if(q.i===23){
+        answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
+          '<div class="note"><b>This one is your U.S. senator.</b> Pick your state and we’ll grade it for you:</div>'+
+          '<div class="cardstate"><select id="state-sel-card" aria-label="Your state">'+stateOptions(store.state)+'</select></div></div>';
+      }else{
+        answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
+          '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+'</div></div>';
+      }
     }else if(q._dynamic){
       const ahead = q.i===23 ? 'Your state’s senators &middot; name either one' : 'Answer';
       answersHTML='<div class="answers"><div class="ahead">'+ahead+'</div><ul>'+
@@ -716,6 +741,7 @@ function renderQuestion(){
     overrideGrade(q,b.dataset.grade);
   });
   const ta=el('#tryagain'); if(ta) ta.onclick=()=>tryAgain(q);
+  const sc=el('#state-sel-card'); if(sc) sc.onchange=()=>setUserState(sc.value);
   const prev=el('#prev'); if(prev) prev.onclick=()=>move(-1);
   const next=el('#next'); if(next) next.onclick=()=>onNext(q);
   const end=el('#endtest'); if(end) end.onclick=confirmEndTest;
@@ -937,14 +963,45 @@ function setMode(m,silent){
 }
 document.querySelectorAll('.modes button').forEach(b=>{ b.onclick=()=>setMode(b.dataset.mode); });
 
-// State selector — drives auto-grading of Q23 (your U.S. senators).
-(function buildStateSelect(){
-  const sel=el('#state-sel'); if(!sel) return;
+// State config — a top-right popover; drives auto-grading of state-specific
+// questions (Q23 senators today; governor/capital later).
+const stateName=code=>{ const m=STATES.find(s=>s[0]===code); return m?m[1]:''; };
+function stateOptions(selected){
   let html='<option value="">— Select your state —</option>';
-  for(const [code,name] of STATES) html+='<option value="'+code+'">'+name+'</option>';
-  sel.innerHTML=html;
-  sel.value=store.state||'';
-  sel.onchange=()=>{ store.state=sel.value; saveStore(); render(); };
+  for(const [code,name] of STATES) html+='<option value="'+code+'"'+(code===selected?' selected':'')+'>'+name+'</option>';
+  return html;
+}
+function refreshStateBtn(){
+  const lab=el('#state-btn-label'), btn=el('#state-btn');
+  if(lab) lab.textContent = store.state ? stateName(store.state) : 'Set your state';
+  if(btn) btn.classList.toggle('set', !!store.state);
+}
+function toggleStatePop(open){
+  const pop=el('#state-pop'), btn=el('#state-btn'); if(!pop) return;
+  const show = open===undefined ? pop.hidden : open;
+  pop.hidden=!show; btn.setAttribute('aria-expanded', show);
+  if(show){ const sel=el('#state-sel'); if(sel) sel.value=store.state||''; }
+}
+function setUserState(code){
+  store.state=code;
+  delete view[23];            // re-answer Q23 against the new state
+  const sel=el('#state-sel'); if(sel) sel.value=code;
+  saveStore();
+  refreshStateBtn();
+  toggleStatePop(false);
+  render();
+}
+(function buildStateConfig(){
+  const sel=el('#state-sel'), btn=el('#state-btn'); if(!sel||!btn) return;
+  sel.innerHTML=stateOptions(store.state);
+  sel.onchange=()=>setUserState(sel.value);
+  btn.onclick=(e)=>{ e.stopPropagation(); toggleStatePop(); };
+  document.addEventListener('click',(e)=>{
+    const pop=el('#state-pop');
+    if(pop && !pop.hidden && !pop.contains(e.target) && e.target!==btn && !btn.contains(e.target)) toggleStatePop(false);
+  });
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') toggleStatePop(false); });
+  refreshStateBtn();
 })();
 
 el('#reset').onclick=()=>{
@@ -970,7 +1027,7 @@ Object.defineProperty(window,'_civicsStore',{get:()=>store}); // debug handle
 
 /* ---------- Keyboard ---------- */
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
   if(mode==='history') return;
   const list=activeList(); if(!list.length) return;
   const q=byId[list[idx]]; const s=q?statesMap()[q.i]:null;
