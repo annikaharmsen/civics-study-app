@@ -767,15 +767,16 @@ function renderQuestion(){
   const end=el('#endtest'); if(end) end.onclick=confirmEndTest;
 }
 
-// Send the given question ids into Practice as a fresh "to study" pile.
-function studyMissed(ids){
+// Focus Practice on a specific set of questions (missed test items, the
+// review pile, etc.) — the deck becomes just these, in order, all unanswered.
+function studyQuestions(ids){
   if(!ids||!ids.length) return;
+  ids=ids.slice();
   lastTestResult=null;
-  if(mode!=='pool') setMode('pool',true);   // build/keep the deck, switch to Practice
-  if(!deck) buildDeck();
-  ids.forEach(id=>{ delete view[id]; });     // clear so they count as unanswered again
-  deckDone=false;
-  idx=Math.max(0, deck.indexOf(ids[0]));
+  if(mode!=='pool') setMode('pool',true);
+  deck=ids;                                 // focused deck = only these questions
+  ids.forEach(id=>{ delete view[id]; });    // mark them unanswered for a fresh pass
+  idx=0; deckDone=false;
   render();
 }
 
@@ -797,7 +798,7 @@ function renderDeckComplete(){
     '</div>';
   el('#reshuffle').onclick=()=>{ buildDeck(); render(); };
   const rm=el('#reviewmissed');
-  if(rm) rm.onclick=()=>studyMissed(deck.filter(id=>view[id]&&view[id].result==='incorrect'));
+  if(rm) rm.onclick=()=>studyQuestions(deck.filter(id=>view[id]&&view[id].result==='incorrect'));
 }
 
 function navHTML(list,q,result){
@@ -841,6 +842,7 @@ function jumpTo(id){
   if(mode==='test'){ return; }              // don't disturb an in-progress test
   if(mode!=='pool') setMode('pool',true);
   if(!deck) buildDeck();
+  if(deck.indexOf(id)===-1) buildDeck();    // jumped outside a focused deck -> back to full 128
   deckDone=false;                            // viewing/reviewing a card again
   idx=Math.max(0, deck.indexOf(id));
   render();
@@ -907,7 +909,7 @@ function renderTestResult(){
     '</div>';
   el('#again').onclick=()=>{ lastTestResult=null; render(); };
   const rm=el('#reviewmissed');
-  if(rm) rm.onclick=()=>studyMissed(r.missedIds);
+  if(rm) rm.onclick=()=>studyQuestions(r.missedIds);
 }
 
 /* ============================================================
@@ -1034,8 +1036,7 @@ el('#reset').onclick=()=>{
 el('#jump-review').onclick=()=>{
   const rev=QUESTIONS.map(q=>q.i).filter(i=>status[i]==='review');
   if(!rev.length){ el('#panel-sub').textContent='Nothing in the review pile yet.'; return; }
-  if(mode!=='pool') setMode('pool',true);   // leave History/Test (test stays resumable) so the jump lands
-  jumpTo(rev[0]);
+  studyQuestions(rev);   // focus Practice on just the review pile
 };
 
 /* Note: the `store.status` object is replaced on full reset, so keep `status`
