@@ -43,7 +43,13 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 /* Stat strip */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 6px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px}
+.stat.go{cursor:pointer;transition:.15s}
+.stat.go:hover,.stat.go:focus-visible{border-color:var(--blue);box-shadow:var(--shadow)}
+.stat#stat-rev.go:hover,.stat#stat-rev.go:focus-visible{border-color:var(--clay)}
 .stat .lab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.go-tag{float:right;color:var(--blue);font-weight:700;text-transform:none;letter-spacing:0;font-size:11px;opacity:0;transition:opacity .15s}
+.go-tag.clay{color:var(--clay)}
+.stat.go:hover .go-tag,.stat.go:focus-visible .go-tag{opacity:1}
 .stat .val{font-family:'Space Grotesk';font-weight:600;font-size:23px;margin-top:3px;display:flex;align-items:baseline;gap:6px}
 .stat .val small{font-size:13px;color:var(--ink-soft);font-weight:500}
 .bar{height:6px;border-radius:99px;background:var(--line);margin-top:9px;overflow:hidden}
@@ -246,9 +252,9 @@ footer a{color:var(--blue)}
   </header>
 
   <div class="stats">
-    <div class="stat"><div class="lab">Pool covered</div><div class="val"><span id="s-cov">0</span><small>/ 128</small></div><div class="bar"><i id="s-cov-bar"></i></div></div>
+    <div class="stat go" id="stat-cov" role="button" tabindex="0" title="Practice the full 128-question deck"><div class="lab">Pool covered <span class="go-tag">Practice &rarr;</span></div><div class="val"><span id="s-cov">0</span><small>/ 128</small></div><div class="bar"><i id="s-cov-bar"></i></div></div>
     <div class="stat"><div class="lab">Accuracy</div><div class="val"><span id="s-acc">—</span></div><div class="bar"><i id="s-acc-bar" style="background:linear-gradient(90deg,var(--green),#3a9568)"></i></div></div>
-    <div class="stat"><div class="lab">Marked for review</div><div class="val" style="color:var(--clay)"><span id="s-rev">0</span></div><div class="bar"><i id="s-rev-bar" style="background:linear-gradient(90deg,var(--clay),#c8654d)"></i></div></div>
+    <div class="stat go" id="stat-rev" role="button" tabindex="0" title="Study just the questions you've missed"><div class="lab">Marked for review <span class="go-tag clay">Study &rarr;</span></div><div class="val" style="color:var(--clay)"><span id="s-rev">0</span></div><div class="bar"><i id="s-rev-bar" style="background:linear-gradient(90deg,var(--clay),#c8654d)"></i></div></div>
   </div>
 
   <div class="modes" role="tablist" aria-label="Study mode">
@@ -992,6 +998,21 @@ function setMode(m,silent){
   render();
 }
 document.querySelectorAll('.modes button').forEach(b=>{ b.onclick=()=>setMode(b.dataset.mode); });
+
+// Standard Practice over the whole pool (fresh full deck when needed).
+function studyAll(){
+  if(mode!=='pool') setMode('pool',true);
+  if(!deck || deck.length<128 || deckDone) buildDeck();
+  render();
+}
+// Clickable header stats: "Pool covered" -> Practice all, "Marked for review" -> review pile.
+function onActivate(id,fn){
+  const elm=el(id); if(!elm) return;
+  elm.onclick=fn;
+  elm.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fn(); } });
+}
+onActivate('#stat-cov', studyAll);
+onActivate('#stat-rev', ()=>studyQuestions(reviewPile(), 'Nothing in the review pile yet — answer some questions first.'));
 
 // State config — a top-right popover; drives auto-grading of state-specific
 // questions (Q23 senators today; governor/capital later).
