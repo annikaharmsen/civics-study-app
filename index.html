@@ -767,10 +767,18 @@ function renderQuestion(){
   const end=el('#endtest'); if(end) end.onclick=confirmEndTest;
 }
 
-// Focus Practice on a specific set of questions (missed test items, the
-// review pile, etc.) — the deck becomes just these, in order, all unanswered.
-function studyQuestions(ids){
-  if(!ids||!ids.length) return;
+// Which questions are "to restudy": derivations shared by every entry point.
+function reviewPile(){ return QUESTIONS.map(q=>q.i).filter(i=>status[i]==='review'); }
+function deckMissed(){ return deck ? deck.filter(id=>view[id]&&view[id].result==='incorrect') : []; }
+function missedInTest(testId){
+  const seen=new Set(), out=[];
+  for(const a of store.attempts) if(a.test===testId && a.result==='incorrect' && !seen.has(a.id)){ seen.add(a.id); out.push(a.id); }
+  return out;
+}
+// Focus Practice on a specific set of questions — the deck becomes just these,
+// in order, all unanswered. Empty input optionally surfaces a message.
+function studyQuestions(ids, emptyMsg){
+  if(!ids||!ids.length){ if(emptyMsg) el('#panel-sub').textContent=emptyMsg; return; }
   ids=ids.slice();
   lastTestResult=null;
   if(mode!=='pool') setMode('pool',true);
@@ -782,9 +790,9 @@ function studyQuestions(ids){
 
 // Shown when every card in the Practice deck has been answered.
 function renderDeckComplete(){
-  const correct=deck.filter(id=>view[id]&&view[id].result==='correct').length;
-  const incorrect=deck.filter(id=>view[id]&&view[id].result==='incorrect').length;
+  const incorrect=deckMissed().length;
   const total=deck.length;
+  const correct=total-incorrect;
   const pct=Math.round(correct/total*100);
   const card=el('#card'); card.className='card';
   card.innerHTML=
@@ -798,7 +806,7 @@ function renderDeckComplete(){
     '</div>';
   el('#reshuffle').onclick=()=>{ buildDeck(); render(); };
   const rm=el('#reviewmissed');
-  if(rm) rm.onclick=()=>studyQuestions(deck.filter(id=>view[id]&&view[id].result==='incorrect'));
+  if(rm) rm.onclick=()=>studyQuestions(deckMissed());
 }
 
 function navHTML(list,q,result){
@@ -934,9 +942,12 @@ function renderHistory(){
     html+='<div class="tlist">'+tests.map(t=>{
       const tp=t.correct>=passNeeded(t.total);
       const label=t.total===128?'Full 128 test':t.total+'-question test';
+      const nMiss=missedInTest(t.id).length;
       return '<div class="trow">'+
         '<div class="tscore">'+t.correct+'<span style="color:var(--ink-soft);font-weight:500">/'+t.total+'</span></div>'+
-        '<div class="tmeta"><div class="tt">'+label+'</div><div class="td">'+fmtDate(t.ts)+' · '+t.score+'%</div></div>'+
+        '<div class="tmeta"><div class="tt">'+label+'</div><div class="td">'+fmtDate(t.ts)+' · '+t.score+'%</div>'+
+          (nMiss?'<button class="linkbtn blue tstudy" data-test="'+t.id+'" style="margin-top:5px">Study '+nMiss+' missed</button>':'')+
+        '</div>'+
         '<span class="badge '+(tp?'pass':'fail')+'">'+(tp?'Passed':'Did not pass')+'</span>'+
       '</div>';
     }).join('')+'</div>';
@@ -960,6 +971,7 @@ function renderHistory(){
     '<button class="linkbtn" id="clearhist">Clear study history</button></div></div>';
 
   card.innerHTML=html;
+  card.querySelectorAll('.tstudy').forEach(b=>b.onclick=()=>studyQuestions(missedInTest(b.dataset.test)));
   el('#clearhist').onclick=()=>{
     if(!store.attempts.length && !store.tests.length) return;
     if(confirm('Clear all attempt history and test scores? Your per-question progress on the board is kept. This cannot be undone.')){
@@ -1033,11 +1045,7 @@ el('#reset').onclick=()=>{
   saveStore();
   setMode('pool');
 };
-el('#jump-review').onclick=()=>{
-  const rev=QUESTIONS.map(q=>q.i).filter(i=>status[i]==='review');
-  if(!rev.length){ el('#panel-sub').textContent='Nothing in the review pile yet.'; return; }
-  studyQuestions(rev);   // focus Practice on just the review pile
-};
+el('#jump-review').onclick=()=>studyQuestions(reviewPile(), 'Nothing in the review pile yet.');
 
 /* Note: the `store.status` object is replaced on full reset, so keep `status`
    pointing at the live object by re-reading through store where it matters. */
