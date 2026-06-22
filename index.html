@@ -50,7 +50,7 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 .go-tag{float:right;color:var(--blue);font-weight:700;text-transform:none;letter-spacing:0;font-size:11px;opacity:0;transition:opacity .15s}
 .go-tag.clay{color:var(--clay)}
 .stat.go:hover .go-tag,.stat.go:focus-visible .go-tag{opacity:1}
-.stat .val{font-family:'Space Grotesk';font-weight:600;font-size:23px;margin-top:3px;display:flex;align-items:baseline;gap:6px}
+.stat .val{font-family:'Space Grotesk';font-weight:600;font-size:23px;margin-top:3px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
 .stat .val small{font-size:13px;color:var(--ink-soft);font-weight:500}
 .bar{height:6px;border-radius:99px;background:var(--line);margin-top:9px;overflow:hidden}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-bright));width:0;transition:width .4s ease}
@@ -174,6 +174,9 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 .exam-intro p{color:var(--ink-soft);font-size:14.5px;max-width:400px;margin:8px auto 18px}
 .pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:420px;margin:0 auto}
 @media(max-width:520px){.pick{grid-template-columns:1fr}}
+/* Bigger, more tappable board cells on phones */
+@media(max-width:520px){.board{grid-template-columns:repeat(6,1fr);gap:6px}.cell{font-size:12px;border-radius:6px}}
+@media(max-width:360px){.board{grid-template-columns:repeat(4,1fr)}}
 .pickcard{text-align:left;border:1.5px solid var(--line-strong);background:#fff;border-radius:12px;padding:16px;cursor:pointer;transition:.15s;font-family:inherit}
 .pickcard:hover{border-color:var(--blue);background:var(--blue-tint)}
 .pickcard .pc-n{font-family:'Space Grotesk';font-weight:600;font-size:22px;color:var(--ink)}
