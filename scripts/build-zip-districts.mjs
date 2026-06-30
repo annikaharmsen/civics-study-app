@@ -14,9 +14,10 @@ const FIPS = {'01':'AL','02':'AK','04':'AZ','05':'AR','06':'CA','08':'CO','09':'
 // not the source. Try direct candidates, then crawl the directory index as a fallback
 // so we don't depend on guessing the exact file name.
 const BASE = 'https://www2.census.gov/geo/docs/maps-data/data/rel2020/';
+// The crosswalk is the CD→ZCTA relationship file under cd-sld/ (note: "cd" before "zcta").
 const DIRECT = [
-  BASE + 'cd119/tab20_zcta520_cd119_natl.txt',
-  BASE + 'cd118/tab20_zcta520_cd118_natl.txt',
+  BASE + 'cd-sld/tab20_cd11920_zcta520_natl.txt',
+  BASE + 'cd-sld/tab20_cd11820_zcta520_natl.txt',
 ];
 
 async function tryUrl(u){
@@ -37,18 +38,16 @@ async function links(u){
 }
 async function crawl(){
   const top = await links(BASE);
-  console.log('rel2020 entries:', top.filter(h => !/^https?:|^\//i.test(h)).join(' '));
-  // ZCTA-to-CD lives under the source-geo folder (zcta520) or the CD folder (cd-sld).
-  const prefer = ['zcta520/', 'cd-sld/'].filter(d => top.includes(d));
-  const dirs = prefer.length ? prefer : top.filter(h => /(zcta520|cd-?sld|cd\d)\/?$/i.test(h));
+  const dirs = ['cd-sld/', 'zcta520/'].filter(d => top.includes(d));
   for(const d of dirs){
-    const dir = BASE + (d.endsWith('/') ? d : d + '/');
+    const dir = BASE + d;
     const files = await links(dir);
-    console.log(dir, 'files:', files.filter(f => !/^https?:|^\//i.test(f)).join(' '));
-    // The CD relationship file's name contains both "zcta5" and "cd".
-    const f = files.find(h => /zcta5.*cd.*natl\.txt$/i.test(h))
-           || files.find(h => /zcta5.*cd.*\.txt$/i.test(h));
-    if(f){ const t = await tryUrl(dir + f.replace(/^.*\//, '')); if(t) return t; }
+    // National CD↔ZCTA relationship file — name contains "cd<NNN>" and "zcta5", in either order.
+    const cands = files
+      .filter(h => /zcta5/i.test(h) && /cd\d/i.test(h) && /natl\.txt$/i.test(h))
+      .sort().reverse();   // prefer the newest Congress (cd119 before cd118)
+    console.log(dir, 'CD×ZCTA candidates:', cands.join(' ') || '(none of ' + files.length + ' files)');
+    for(const f of cands){ const t = await tryUrl(dir + f.replace(/^.*\//, '')); if(t) return t; }
   }
   return null;
 }
