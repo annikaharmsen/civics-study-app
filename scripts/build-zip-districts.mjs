@@ -10,21 +10,48 @@ const FIPS = {'01':'AL','02':'AK','04':'AZ','05':'AR','06':'CA','08':'CO','09':'
   '39':'OH','40':'OK','41':'OR','42':'PA','44':'RI','45':'SC','46':'SD','47':'TN','48':'TX',
   '49':'UT','50':'VT','51':'VA','53':'WA','54':'WV','55':'WI','56':'WY'};
 
-// Try the newest Congress first, fall back to the prior one.
-const URLS = [
-  'https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_cd119_natl.txt',
-  'https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_cd118_natl.txt',
+// Census 2020 relationship files are foldered by the TARGET geography (cd118/cd119),
+// not the source. Try direct candidates, then crawl the directory index as a fallback
+// so we don't depend on guessing the exact file name.
+const BASE = 'https://www2.census.gov/geo/docs/maps-data/data/rel2020/';
+const DIRECT = [
+  BASE + 'cd119/tab20_zcta520_cd119_natl.txt',
+  BASE + 'cd118/tab20_zcta520_cd118_natl.txt',
 ];
 
-async function getText(){
-  for(const u of URLS){
-    try{
-      const r = await fetch(u);
-      if(r.ok){ console.log('using', u); return await r.text(); }
-      console.log('skip', r.status, u);
-    }catch(e){ console.log('error', u, e.message); }
+async function tryUrl(u){
+  try{
+    const r = await fetch(u);
+    if(r.ok){ console.log('using', u); return await r.text(); }
+    console.log('skip', r.status, u);
+  }catch(e){ console.log('error', u, e.message); }
+  return null;
+}
+async function links(u){
+  try{
+    const r = await fetch(u);
+    if(!r.ok){ console.log('index', r.status, u); return []; }
+    const html = await r.text();
+    return [...html.matchAll(/href="([^"?][^"]*)"/gi)].map(m => m[1]);
+  }catch(e){ console.log('index error', u, e.message); return []; }
+}
+async function crawl(){
+  const top = await links(BASE);
+  console.log('rel2020 entries:', top.filter(h => !h.startsWith('/')).join(' '));
+  const dirs = top.filter(h => /^cd\d/i.test(h)).sort().reverse();   // cd119, cd118, ...
+  for(const d of dirs){
+    const dir = BASE + (d.endsWith('/') ? d : d + '/');
+    const files = await links(dir);
+    const f = files.find(h => /zcta5.*natl\.txt$/i.test(h));
+    if(f){ const t = await tryUrl(dir + f.replace(/^.*\//, '')); if(t) return t; }
   }
-  throw new Error('No Census relationship file was reachable.');
+  return null;
+}
+async function getText(){
+  for(const u of DIRECT){ const t = await tryUrl(u); if(t) return t; }
+  const t = await crawl();
+  if(t) return t;
+  throw new Error('No Census ZCTA-to-CD relationship file found.');
 }
 
 const txt = await getText();
