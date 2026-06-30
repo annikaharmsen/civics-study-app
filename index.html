@@ -388,6 +388,62 @@ const GOVERNORS={
   VT:["Phil Scott","Scott"], VA:["Abigail Spanberger","Spanberger"], WA:["Bob Ferguson","Ferguson"],
   WI:["Tony Evers","Evers"], WY:["Mark Gordon","Gordon"]
 };
+// Q29: U.S. House representatives, keyed by state then district ("AL"=at-large/DC delegate).
+// [full name, last name]. Territories not in the state picker are omitted.
+const REPS={
+  AL:{"1":["Barry Moore","Moore"],"2":["Shomari Figures","Figures"],"3":["Mike Rogers","Rogers"],"4":["Robert Aderholt","Aderholt"],"5":["Dale Strong","Strong"],"6":["Gary Palmer","Palmer"],"7":["Terri Sewell","Sewell"]},
+  AK:{"AL":["Nicholas Begich","Begich"]},
+  AZ:{"1":["David Schweikert","Schweikert"],"2":["Elijah Crane","Crane"],"3":["Yassamin Ansari","Ansari"],"4":["Greg Stanton","Stanton"],"5":["Andy Biggs","Biggs"],"6":["Juan Ciscomani","Ciscomani"],"7":["Adelita Grijalva","Grijalva"],"8":["Abraham Hamadeh","Hamadeh"],"9":["Paul Gosar","Gosar"]},
+  AR:{"1":["Eric Crawford","Crawford"],"2":["J. Hill","Hill"],"3":["Steve Womack","Womack"],"4":["Bruce Westerman","Westerman"]},
+  CA:{"1":["James Gallagher","Gallagher"],"2":["Jared Huffman","Huffman"],"3":["Kevin Kiley","Kiley"],"4":["Mike Thompson","Thompson"],"5":["Tom McClintock","McClintock"],"6":["Ami Bera","Bera"],"7":["Doris Matsui","Matsui"],"8":["John Garamendi","Garamendi"],"9":["Josh Harder","Harder"],"10":["Mark DeSaulnier","DeSaulnier"],"11":["Nancy Pelosi","Pelosi"],"12":["Lateefah Simon","Simon"],"13":["Adam Gray","Gray"],"14":["Eric Swalwell","Swalwell"],"15":["Kevin Mullin","Mullin"],"16":["Sam Liccardo","Liccardo"],"17":["Ro Khanna","Khanna"],"18":["Zoe Lofgren","Lofgren"],"19":["Jimmy Panetta","Panetta"],"20":["Vince Fong","Fong"],"21":["Jim Costa","Costa"],"22":["David Valadao","Valadao"],"23":["Jay Obernolte","Obernolte"],"24":["Salud Carbajal","Carbajal"],"25":["Raul Ruiz","Ruiz"],"26":["Julia Brownley","Brownley"],"27":["George Whitesides","Whitesides"],"28":["Judy Chu","Chu"],"29":["Luz Rivas","Rivas"],"30":["Laura Friedman","Friedman"],"31":["Gilbert Cisneros","Cisneros"],"32":["Brad Sherman","Sherman"],"33":["Pete Aguilar","Aguilar"],"34":["Jimmy Gomez","Gomez"],"35":["Norma Torres","Torres"],"36":["Ted Lieu","Lieu"],"37":["Sydney Kamlager-Dove","Kamlager-Dove"],"38":["Linda Sanchez","Sanchez"],"39":["Mark Takano","Takano"],"40":["Young Kim","Kim"],"41":["Ken Calvert","Calvert"],"42":["Robert Garcia","Garcia"],"43":["Maxine Waters","Waters"],"44":["Nanette Barragan","Barragan"],"45":["Derek Tran","Tran"],"46":["J. Correa","Correa"],"47":["Dave Min","Min"],"48":["Darrell Issa","Issa"],"49":["Mike Levin","Levin"],"50":["Scott Peters","Peters"],"51":["Sara Jacobs","Jacobs"],"52":["Juan Vargas","Vargas"]},
+  CO:{"1":["Diana DeGette","DeGette"],"2":["Joe Neguse","Neguse"],"3":["Jeff Hurd","Hurd"],"4":["Lauren Boebert","Boebert"],"5":["Jeff Crank","Crank"],"6":["Jason Crow","Crow"],"7":["Brittany Pettersen","Pettersen"],"8":["Gabe Evans","Evans"]},
+  CT:{"1":["John Larson","Larson"],"2":["Joe Courtney","Courtney"],"3":["Rosa DeLauro","DeLauro"],"4":["James Himes","Himes"],"5":["Jahana Hayes","Hayes"]},
+  DE:{"AL":["Sarah McBride","McBride"]},
+  DC:{"AL":["Eleanor Norton","Norton"]},
+  FL:{"1":["Jimmy Patronis","Patronis"],"2":["Neal Dunn","Dunn"],"3":["Kat Cammack","Cammack"],"4":["Aaron Bean","Bean"],"5":["John Rutherford","Rutherford"],"6":["Randy Fine","Fine"],"7":["Cory Mills","Mills"],"8":["Mike Haridopolos","Haridopolos"],"9":["Darren Soto","Soto"],"10":["Maxwell Frost","Frost"],"11":["Daniel Webster","Webster"],"12":["Gus Bilirakis","Bilirakis"],"13":["Anna Paulina Luna","Luna"],"14":["Kathy Castor","Castor"],"15":["Laurel Lee","Lee"],"16":["Vern Buchanan","Buchanan"],"17":["W. Steube","Steube"],"18":["Scott Franklin","Franklin"],"19":["Byron Donalds","Donalds"],"20":["Sheila Cherfilus-McCormick","Cherfilus-McCormick"],"21":["Brian Mast","Mast"],"22":["Lois Frankel","Frankel"],"23":["Jared Moskowitz","Moskowitz"],"24":["Frederica Wilson","Wilson"],"25":["Debbie Wasserman Schultz","Wasserman Schultz"],"26":["Mario Diaz-Balart","Diaz-Balart"],"27":["Maria Salazar","Salazar"],"28":["Carlos Gimenez","Gimenez"]},
+  GA:{"1":["Earl Carter","Carter"],"2":["Sanford Bishop","Bishop"],"3":["Brian Jack","Jack"],"4":["Henry Johnson","Johnson"],"5":["Nikema Williams","Williams"],"6":["Lucy McBath","McBath"],"7":["Richard McCormick","McCormick"],"8":["Austin Scott","Scott"],"9":["Andrew Clyde","Clyde"],"10":["Mike Collins","Collins"],"11":["Barry Loudermilk","Loudermilk"],"12":["Rick Allen","Allen"],"13":["David Scott","Scott"],"14":["Clay Fuller","Fuller"]},
+  HI:{"1":["Ed Case","Case"],"2":["Jill Tokuda","Tokuda"]},
+  ID:{"1":["Russ Fulcher","Fulcher"],"2":["Michael Simpson","Simpson"]},
+  IL:{"1":["Jonathan Jackson","Jackson"],"2":["Robin Kelly","Kelly"],"3":["Delia Ramirez","Ramirez"],"4":["Jesus Garcia","Garcia"],"5":["Mike Quigley","Quigley"],"6":["Sean Casten","Casten"],"7":["Danny Davis","Davis"],"8":["Raja Krishnamoorthi","Krishnamoorthi"],"9":["Janice Schakowsky","Schakowsky"],"10":["Bradley Schneider","Schneider"],"11":["Bill Foster","Foster"],"12":["Mike Bost","Bost"],"13":["Nikki Budzinski","Budzinski"],"14":["Lauren Underwood","Underwood"],"15":["Mary Miller","Miller"],"16":["Darin LaHood","LaHood"],"17":["Eric Sorensen","Sorensen"]},
+  IN:{"1":["Frank Mrvan","Mrvan"],"2":["Rudy Yakym","Yakym"],"3":["Marlin Stutzman","Stutzman"],"4":["James Baird","Baird"],"5":["Victoria Spartz","Spartz"],"6":["Jefferson Shreve","Shreve"],"7":["Andre Carson","Carson"],"8":["Mark Messmer","Messmer"],"9":["Erin Houchin","Houchin"]},
+  IA:{"1":["Mariannette Miller-Meeks","Miller-Meeks"],"2":["Ashley Hinson","Hinson"],"3":["Zachary Nunn","Nunn"],"4":["Randy Feenstra","Feenstra"]},
+  KS:{"1":["Tracey Mann","Mann"],"2":["Derek Schmidt","Schmidt"],"3":["Sharice Davids","Davids"],"4":["Ron Estes","Estes"]},
+  KY:{"1":["James Comer","Comer"],"2":["Brett Guthrie","Guthrie"],"3":["Morgan McGarvey","McGarvey"],"4":["Thomas Massie","Massie"],"5":["Harold Rogers","Rogers"],"6":["Andy Barr","Barr"]},
+  LA:{"1":["Steve Scalise","Scalise"],"2":["Troy Carter","Carter"],"3":["Clay Higgins","Higgins"],"4":["Mike Johnson","Johnson"],"5":["Julia Letlow","Letlow"],"6":["Cleo Fields","Fields"]},
+  ME:{"1":["Chellie Pingree","Pingree"],"2":["Jared Golden","Golden"]},
+  MD:{"1":["Andy Harris","Harris"],"2":["Johnny Olszewski","Olszewski"],"3":["Sarah Elfreth","Elfreth"],"4":["Glenn Ivey","Ivey"],"5":["Steny Hoyer","Hoyer"],"6":["April McClain Delaney","McClain Delaney"],"7":["Kweisi Mfume","Mfume"],"8":["Jamie Raskin","Raskin"]},
+  MA:{"1":["Richard Neal","Neal"],"2":["James McGovern","McGovern"],"3":["Lori Trahan","Trahan"],"4":["Jake Auchincloss","Auchincloss"],"5":["Katherine Clark","Clark"],"6":["Seth Moulton","Moulton"],"7":["Ayanna Pressley","Pressley"],"8":["Stephen Lynch","Lynch"],"9":["William Keating","Keating"]},
+  MI:{"1":["Jack Bergman","Bergman"],"2":["John Moolenaar","Moolenaar"],"3":["Hillary Scholten","Scholten"],"4":["Bill Huizenga","Huizenga"],"5":["Tim Walberg","Walberg"],"6":["Debbie Dingell","Dingell"],"7":["Tom Barrett","Barrett"],"8":["Kristen McDonald Rivet","McDonald Rivet"],"9":["Lisa McClain","McClain"],"10":["John James","James"],"11":["Haley Stevens","Stevens"],"12":["Rashida Tlaib","Tlaib"],"13":["Shri Thanedar","Thanedar"]},
+  MN:{"1":["Brad Finstad","Finstad"],"2":["Angie Craig","Craig"],"3":["Kelly Morrison","Morrison"],"4":["Betty McCollum","McCollum"],"5":["Ilhan Omar","Omar"],"6":["Tom Emmer","Emmer"],"7":["Michelle Fischbach","Fischbach"],"8":["Pete Stauber","Stauber"]},
+  MS:{"1":["Trent Kelly","Kelly"],"2":["Bennie Thompson","Thompson"],"3":["Michael Guest","Guest"],"4":["Mike Ezell","Ezell"]},
+  MO:{"1":["Wesley Bell","Bell"],"2":["Ann Wagner","Wagner"],"3":["Robert Onder","Onder"],"4":["Mark Alford","Alford"],"5":["Emanuel Cleaver","Cleaver"],"6":["Sam Graves","Graves"],"7":["Eric Burlison","Burlison"],"8":["Jason Smith","Smith"]},
+  MT:{"1":["Ryan Zinke","Zinke"],"2":["Troy Downing","Downing"]},
+  NE:{"1":["Mike Flood","Flood"],"2":["Don Bacon","Bacon"],"3":["Adrian Smith","Smith"]},
+  NV:{"1":["Dina Titus","Titus"],"2":["Mark Amodei","Amodei"],"3":["Susie Lee","Lee"],"4":["Steven Horsford","Horsford"]},
+  NH:{"1":["Chris Pappas","Pappas"],"2":["Maggie Goodlander","Goodlander"]},
+  NJ:{"1":["Donald Norcross","Norcross"],"2":["Jefferson Van Drew","Van Drew"],"3":["Herbert Conaway","Conaway"],"4":["Christopher Smith","Smith"],"5":["Josh Gottheimer","Gottheimer"],"6":["Frank Pallone","Pallone"],"7":["Thomas Kean","Kean"],"8":["Robert Menendez","Menendez"],"9":["Nellie Pou","Pou"],"10":["LaMonica McIver","McIver"],"11":["Analilia Mejia","Mejia"],"12":["Bonnie Watson Coleman","Watson Coleman"]},
+  NM:{"1":["Melanie Stansbury","Stansbury"],"2":["Gabe Vasquez","Vasquez"],"3":["Teresa Leger Fernandez","Leger Fernandez"]},
+  NY:{"1":["Nick LaLota","LaLota"],"2":["Andrew Garbarino","Garbarino"],"3":["Thomas R. Suozzi","Suozzi"],"4":["Laura Gillen","Gillen"],"5":["Gregory Meeks","Meeks"],"6":["Grace Meng","Meng"],"7":["Nydia Velazquez","Velazquez"],"8":["Hakeem Jeffries","Jeffries"],"9":["Yvette Clarke","Clarke"],"10":["Daniel Goldman","Goldman"],"11":["Nicole Malliotakis","Malliotakis"],"12":["Jerrold Nadler","Nadler"],"13":["Adriano Espaillat","Espaillat"],"14":["Alexandria Ocasio-Cortez","Ocasio-Cortez"],"15":["Ritchie Torres","Torres"],"16":["George Latimer","Latimer"],"17":["Michael Lawler","Lawler"],"18":["Patrick Ryan","Ryan"],"19":["Josh Riley","Riley"],"20":["Paul Tonko","Tonko"],"21":["Elise Stefanik","Stefanik"],"22":["John Mannion","Mannion"],"23":["Nicholas Langworthy","Langworthy"],"24":["Claudia Tenney","Tenney"],"25":["Joseph Morelle","Morelle"],"26":["Timothy Kennedy","Kennedy"]},
+  NC:{"1":["Donald Davis","Davis"],"2":["Deborah Ross","Ross"],"3":["Gregory Murphy","Murphy"],"4":["Valerie Foushee","Foushee"],"5":["Virginia Foxx","Foxx"],"6":["Addison McDowell","McDowell"],"7":["David Rouzer","Rouzer"],"8":["Mark Harris","Harris"],"9":["Richard Hudson","Hudson"],"10":["Pat Harrigan","Harrigan"],"11":["Chuck Edwards","Edwards"],"12":["Alma Adams","Adams"],"13":["Brad Knott","Knott"],"14":["Tim Moore","Moore"]},
+  ND:{"AL":["Julie Fedorchak","Fedorchak"]},
+  OH:{"1":["Greg Landsman","Landsman"],"2":["David Taylor","Taylor"],"3":["Joyce Beatty","Beatty"],"4":["Jim Jordan","Jordan"],"5":["Robert Latta","Latta"],"6":["Michael A. Rulli","Rulli"],"7":["Max Miller","Miller"],"8":["Warren Davidson","Davidson"],"9":["Marcy Kaptur","Kaptur"],"10":["Michael Turner","Turner"],"11":["Shontel Brown","Brown"],"12":["Troy Balderson","Balderson"],"13":["Emilia Sykes","Sykes"],"14":["David Joyce","Joyce"],"15":["Mike Carey","Carey"]},
+  OK:{"1":["Kevin Hern","Hern"],"2":["Josh Brecheen","Brecheen"],"3":["Frank Lucas","Lucas"],"4":["Tom Cole","Cole"],"5":["Stephanie Bice","Bice"]},
+  OR:{"1":["Suzanne Bonamici","Bonamici"],"2":["Cliff Bentz","Bentz"],"3":["Maxine Dexter","Dexter"],"4":["Val Hoyle","Hoyle"],"5":["Janelle Bynum","Bynum"],"6":["Andrea Salinas","Salinas"]},
+  PA:{"1":["Brian Fitzpatrick","Fitzpatrick"],"2":["Brendan Boyle","Boyle"],"3":["Dwight Evans","Evans"],"4":["Madeleine Dean","Dean"],"5":["Mary Gay Scanlon","Scanlon"],"6":["Chrissy Houlahan","Houlahan"],"7":["Ryan Mackenzie","Mackenzie"],"8":["Robert Bresnahan","Bresnahan"],"9":["Daniel Meuser","Meuser"],"10":["Scott Perry","Perry"],"11":["Lloyd Smucker","Smucker"],"12":["Summer Lee","Lee"],"13":["John Joyce","Joyce"],"14":["Guy Reschenthaler","Reschenthaler"],"15":["Glenn Thompson","Thompson"],"16":["Mike Kelly","Kelly"],"17":["Christopher Deluzio","Deluzio"]},
+  RI:{"1":["Gabe Amo","Amo"],"2":["Seth Magaziner","Magaziner"]},
+  SC:{"1":["Nancy Mace","Mace"],"2":["Joe Wilson","Wilson"],"3":["Sheri Biggs","Biggs"],"4":["William Timmons","Timmons"],"5":["Ralph Norman","Norman"],"6":["James Clyburn","Clyburn"],"7":["Russell Fry","Fry"]},
+  SD:{"AL":["Dusty Johnson","Johnson"]},
+  TN:{"1":["Diana Harshbarger","Harshbarger"],"2":["Tim Burchett","Burchett"],"3":["Charles Fleischmann","Fleischmann"],"4":["Scott DesJarlais","DesJarlais"],"5":["Andrew Ogles","Ogles"],"6":["John Rose","Rose"],"7":["Matt Van Epps","Van Epps"],"8":["David Kustoff","Kustoff"],"9":["Steve Cohen","Cohen"]},
+  TX:{"1":["Nathaniel Moran","Moran"],"2":["Dan Crenshaw","Crenshaw"],"3":["Keith Self","Self"],"4":["Pat Fallon","Fallon"],"5":["Lance Gooden","Gooden"],"6":["Jake Ellzey","Ellzey"],"7":["Lizzie Fletcher","Fletcher"],"8":["Morgan Luttrell","Luttrell"],"9":["Al Green","Green"],"10":["Michael McCaul","McCaul"],"11":["August Pfluger","Pfluger"],"12":["Craig Goldman","Goldman"],"13":["Ronny Jackson","Jackson"],"14":["Randy Weber","Weber"],"15":["Monica De La Cruz","De La Cruz"],"16":["Veronica Escobar","Escobar"],"17":["Pete Sessions","Sessions"],"18":["Christian Menefee","Menefee"],"19":["Jodey Arrington","Arrington"],"20":["Joaquin Castro","Castro"],"21":["Chip Roy","Roy"],"22":["Troy Nehls","Nehls"],"23":["Tony Gonzales","Gonzales"],"24":["Beth Van Duyne","Van Duyne"],"25":["Roger Williams","Williams"],"26":["Brandon Gill","Gill"],"27":["Michael Cloud","Cloud"],"28":["Henry Cuellar","Cuellar"],"29":["Sylvia Garcia","Garcia"],"30":["Jasmine Crockett","Crockett"],"31":["John Carter","Carter"],"32":["Julie Johnson","Johnson"],"33":["Marc Veasey","Veasey"],"34":["Vicente Gonzalez","Gonzalez"],"35":["Greg Casar","Casar"],"36":["Brian Babin","Babin"],"37":["Lloyd Doggett","Doggett"],"38":["Wesley Hunt","Hunt"]},
+  UT:{"1":["Blake Moore","Moore"],"2":["Celeste Maloy","Maloy"],"3":["Mike Kennedy","Kennedy"],"4":["Burgess Owens","Owens"]},
+  VT:{"AL":["Becca Balint","Balint"]},
+  VA:{"1":["Robert Wittman","Wittman"],"2":["Jennifer Kiggans","Kiggans"],"3":["Robert Scott","Scott"],"4":["Jennifer McClellan","McClellan"],"5":["John McGuire","McGuire"],"6":["Ben Cline","Cline"],"7":["Eugene Vindman","Vindman"],"8":["Donald Beyer","Beyer"],"9":["H. Griffith","Griffith"],"10":["Suhas Subramanyam","Subramanyam"],"11":["James Walkinshaw","Walkinshaw"]},
+  WA:{"1":["Suzan DelBene","DelBene"],"2":["Rick Larsen","Larsen"],"3":["Marie Perez","Perez"],"4":["Dan Newhouse","Newhouse"],"5":["Michael Baumgartner","Baumgartner"],"6":["Emily Randall","Randall"],"7":["Pramila Jayapal","Jayapal"],"8":["Kim Schrier","Schrier"],"9":["Adam Smith","Smith"],"10":["Marilyn Strickland","Strickland"]},
+  WV:{"1":["Carol Miller","Miller"],"2":["Riley Moore","Moore"]},
+  WI:{"1":["Bryan Steil","Steil"],"2":["Mark Pocan","Pocan"],"3":["Derrick Van Orden","Van Orden"],"4":["Gwen Moore","Moore"],"5":["Scott Fitzgerald","Fitzgerald"],"6":["Glenn Grothman","Grothman"],"7":["Thomas Tiffany","Tiffany"],"8":["Tony Wied","Wied"]},
+  WY:{"AL":["Harriet Hageman","Hageman"]}
+};
+
 const STATES=[["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],
   ["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","District of Columbia"],["FL","Florida"],
   ["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],
@@ -414,7 +470,19 @@ function effectiveQ(q){
     const g=GOVERNORS[store.state];
     return Object.assign({}, q, {a:[g[0],g[1]], need:1, _dynamic:true, _display:[g[0]]});
   }
+  if(q.i===29 && REPS[store.state]){
+    const d=resolvedDistrict();                  // auto for single-district states, else the chosen one
+    if(d){ const r=REPS[store.state][d]; return Object.assign({}, q, {a:[r[0],r[1]], need:1, _dynamic:true, _display:[r[0]]}); }
+  }
   return q;
+}
+// District helpers for Q29.
+function repKeys(st){ return REPS[st] ? Object.keys(REPS[st]).sort((a,b)=>(a==='AL'?0:+a)-(b==='AL'?0:+b)) : []; }
+function resolvedDistrict(){
+  const ks=repKeys(store.state);
+  if(ks.length===1) return ks[0];                                // at-large / DC: no choice needed
+  if(store.district!=null && REPS[store.state] && REPS[store.state][store.district]) return store.district;
+  return null;
 }
 
 /* ============================================================
@@ -424,7 +492,7 @@ const STORAGE_KEY='civics128:v1';
 const ATTEMPT_CAP=2000;
 let memoryOnly=false;
 
-function freshStore(){ return {status:{}, attempts:[], tests:[], activeTest:null, state:''}; }
+function freshStore(){ return {status:{}, attempts:[], tests:[], activeTest:null, state:'', district:null}; }
 function loadStore(){
   try{
     const raw=localStorage.getItem(STORAGE_KEY);
@@ -435,7 +503,8 @@ function loadStore(){
         attempts:Array.isArray(o&&o.attempts)?o.attempts:[],
         tests:Array.isArray(o&&o.tests)?o.tests:[],
         activeTest:(o&&o.activeTest)||null,
-        state:(o&&o.state)||''
+        state:(o&&o.state)||'',
+        district:(o&&o.district)||null
       };
     }
   }catch(e){ /* corrupt or unavailable */ }
@@ -682,12 +751,18 @@ function renderQuestion(){
   let answersHTML='';
   if(revealed){
     if(vary){
-      const stateQ=(q.i===23||q.i===61);
+      const stateQ=(q.i===23||q.i===61||q.i===29);
       if(stateQ && !store.state){
-        const what = q.i===23 ? 'your U.S. senator' : 'your governor';
+        const what = q.i===23 ? 'your U.S. senator' : q.i===61 ? 'your governor' : 'your U.S. representative';
         answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
           '<div class="note"><b>This one depends on your state — it’s '+what+'.</b> Pick your state and we’ll grade it for you:</div>'+
           '<div class="cardstate"><select id="state-sel-card" aria-label="Your state">'+stateOptions(store.state)+'</select></div></div>';
+      }else if(q.i===29 && REPS[store.state]){
+        const opts='<option value="">— Select your district —</option>'+
+          repKeys(store.state).map(k=>'<option value="'+k+'"'+(k===store.district?' selected':'')+'>'+(k==='AL'?'At-large':'District '+k)+'</option>').join('');
+        answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
+          '<div class="note"><b>This is your U.S. representative.</b> Pick your congressional district in '+escapeHtml(stateName(store.state))+':</div>'+
+          '<div class="cardstate"><select id="district-sel-card" aria-label="Your district">'+opts+'</select></div></div>';
       }else{
         const noData = (stateQ && store.state) ? ' We don’t have this for '+escapeHtml(stateName(store.state))+' yet — grade yourself.' : '';
         answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
@@ -695,7 +770,7 @@ function renderQuestion(){
       }
     }else if(q._dynamic){
       const ahead = q.i===23 ? 'Your state’s senators &middot; name either one'
-        : q.i===61 ? 'Your governor' : 'Answer';
+        : q.i===61 ? 'Your governor' : q.i===29 ? 'Your U.S. representative' : 'Answer';
       answersHTML='<div class="answers"><div class="ahead">'+ahead+'</div><ul>'+
         q._display.map(a=>'<li class="oneof">'+escapeHtml(a)+'</li>').join('')+'</ul></div>';
     }else{
@@ -772,6 +847,7 @@ function renderQuestion(){
   });
   const ta=el('#tryagain'); if(ta) ta.onclick=()=>tryAgain(q);
   const sc=el('#state-sel-card'); if(sc) sc.onchange=()=>setUserState(sc.value);
+  const dc=el('#district-sel-card'); if(dc) dc.onchange=()=>setUserDistrict(dc.value);
   const prev=el('#prev'); if(prev) prev.onclick=()=>move(-1);
   const next=el('#next'); if(next) next.onclick=()=>onNext(q);
   const end=el('#endtest'); if(end) end.onclick=confirmEndTest;
@@ -1039,11 +1115,18 @@ function toggleStatePop(open){
 }
 function setUserState(code){
   store.state=code;
-  delete view[23]; delete view[61];   // re-answer state-dependent questions
+  store.district=null;                          // district is state-specific
+  delete view[23]; delete view[61]; delete view[29];   // re-answer state-dependent questions
   const sel=el('#state-sel'); if(sel) sel.value=code;
   saveStore();
   refreshStateBtn();
   toggleStatePop(false);
+  render();
+}
+function setUserDistrict(d){
+  store.district = d || null;
+  delete view[29];
+  saveStore();
   render();
 }
 (function buildStateConfig(){
