@@ -164,6 +164,10 @@ header.top{display:flex; align-items:flex-end; justify-content:space-between; ga
 .cardstate{margin-top:12px}
 .cardstate select{width:100%;max-width:340px;font-family:Inter,system-ui,sans-serif;font-size:15px;color:var(--ink);background:#fff;border:1.5px solid var(--blue);border-radius:10px;padding:11px 13px;cursor:pointer}
 .cardstate select:focus{outline:none;box-shadow:0 0 0 3px var(--blue-tint)}
+.cardstate input{width:140px;font-family:Inter,system-ui,sans-serif;font-size:15px;color:var(--ink);background:#fff;border:1.5px solid var(--blue);border-radius:10px;padding:11px 13px;letter-spacing:.04em}
+.cardstate input:focus{outline:none;box-shadow:0 0 0 3px var(--blue-tint)}
+.zip-status{font-size:12.5px;color:var(--ink-soft);margin-left:10px}
+.ziphint{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin:14px 0 0}
 .panelfoot{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .linkbtn{font-size:12.5px;color:var(--clay);background:none;border:0;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
 .linkbtn.blue{color:var(--blue)}
@@ -751,20 +755,15 @@ function renderQuestion(){
   let answersHTML='';
   if(revealed){
     if(vary){
-      const stateQ=(q.i===23||q.i===61||q.i===29);
-      if(stateQ && !store.state){
-        const what = q.i===23 ? 'your U.S. senator' : q.i===61 ? 'your governor' : 'your U.S. representative';
+      if(q.i===29){
+        answersHTML=renderRepConfig();
+      }else if((q.i===23||q.i===61) && !store.state){
+        const what = q.i===23 ? 'your U.S. senator' : 'your governor';
         answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
           '<div class="note"><b>This one depends on your state — it’s '+what+'.</b> Pick your state and we’ll grade it for you:</div>'+
           '<div class="cardstate"><select id="state-sel-card" aria-label="Your state">'+stateOptions(store.state)+'</select></div></div>';
-      }else if(q.i===29 && REPS[store.state]){
-        const opts='<option value="">— Select your district —</option>'+
-          repKeys(store.state).map(k=>'<option value="'+k+'"'+(k===store.district?' selected':'')+'>'+(k==='AL'?'At-large':'District '+k)+'</option>').join('');
-        answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
-          '<div class="note"><b>This is your U.S. representative.</b> Pick your congressional district in '+escapeHtml(stateName(store.state))+':</div>'+
-          '<div class="cardstate"><select id="district-sel-card" aria-label="Your district">'+opts+'</select></div></div>';
       }else{
-        const noData = (stateQ && store.state) ? ' We don’t have this for '+escapeHtml(stateName(store.state))+' yet — grade yourself.' : '';
+        const noData = (store.state && (q.i===23||q.i===61)) ? ' We don’t have this for '+escapeHtml(stateName(store.state))+' yet — grade yourself.' : '';
         answersHTML='<div class="answers"><div class="ahead">Official answer</div>'+
           '<div class="note"><b>This answer varies</b> by your location or current officials. '+escapeHtml(q.a[0])+noData+'</div></div>';
       }
@@ -848,6 +847,8 @@ function renderQuestion(){
   const ta=el('#tryagain'); if(ta) ta.onclick=()=>tryAgain(q);
   const sc=el('#state-sel-card'); if(sc) sc.onchange=()=>setUserState(sc.value);
   const dc=el('#district-sel-card'); if(dc) dc.onchange=()=>setUserDistrict(dc.value);
+  const zc=el('#zip-sel-card');
+  if(zc){ zc.addEventListener('input',()=>{ const v=zc.value.replace(/\D/g,'').slice(0,5); if(zc.value!==v) zc.value=v; if(v.length===5) resolveZip(v); }); }
   const prev=el('#prev'); if(prev) prev.onclick=()=>move(-1);
   const next=el('#next'); if(next) next.onclick=()=>onNext(q);
   const end=el('#endtest'); if(end) end.onclick=confirmEndTest;
@@ -1127,6 +1128,43 @@ function setUserDistrict(d){
   store.district = d || null;
   delete view[29];
   saveStore();
+  render();
+}
+// Inline Q29 config: ZIP lookup (preferred) + manual state/district fallback.
+function renderRepConfig(){
+  const manual = !store.state
+    ? '<select id="state-sel-card" aria-label="Your state">'+stateOptions(store.state)+'</select>'
+    : '<select id="district-sel-card" aria-label="Your district"><option value="">— Select your district —</option>'+
+        repKeys(store.state).map(k=>'<option value="'+k+'"'+(k===store.district?' selected':'')+'>'+(k==='AL'?'At-large':'District '+k)+'</option>').join('')+'</select>';
+  const where = store.state ? ' in '+escapeHtml(stateName(store.state)) : '';
+  return '<div class="answers"><div class="ahead">Official answer</div>'+
+    '<div class="note"><b>This is your U.S. representative.</b> Enter your ZIP code and we’ll find your district'+where+':</div>'+
+    '<div class="cardstate"><input id="zip-sel-card" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="ZIP code"><span id="zip-status" class="zip-status"></span></div>'+
+    '<div class="ziphint">or choose manually</div>'+
+    '<div class="cardstate">'+manual+'</div></div>';
+}
+// Lazy-load the same-origin ZIP→district map (built by a GitHub Action). Cached per session.
+let _zipData=null, _zipLoad=null;
+function loadZipData(){
+  if(_zipData) return Promise.resolve(_zipData);
+  if(_zipLoad) return _zipLoad;
+  _zipLoad = fetch('./zip-districts.json')
+    .then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(d=>{ _zipData=d; return d; })
+    .catch(()=>null);
+  return _zipLoad;
+}
+async function resolveZip(zip){
+  const status=el('#zip-status');
+  if(status) status.textContent='Looking up…';
+  const data=await loadZipData();
+  if(!data){ if(status) status.textContent='ZIP lookup unavailable — choose manually.'; return; }
+  const hit=data[zip];
+  if(!hit){ if(status) status.textContent='ZIP not found — choose manually.'; return; }
+  const dash=hit.indexOf('-'), st=hit.slice(0,dash), d=hit.slice(dash+1);
+  store.state=st; store.district=d;
+  delete view[23]; delete view[61]; delete view[29];   // location-dependent answers changed
+  saveStore(); refreshStateBtn();
   render();
 }
 (function buildStateConfig(){

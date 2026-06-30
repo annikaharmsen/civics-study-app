@@ -26,9 +26,14 @@ across sessions.
 - **Location-aware grading** — set **your state** from the button in the top-right (or right on the
   card) and the state-specific questions auto-grade against the real answer: **your U.S. senators**
   (Q23), **your governor** (Q61), and **your U.S. representative** (Q29 — pick your congressional
-  district inline; single-district states resolve automatically). Current national office-holders —
-  Speaker, President, Vice President, Chief Justice — are graded too. Anything without data falls
-  back to self-grading.
+  district inline — or just **enter your ZIP code** and it finds your district for you; single-district
+  states resolve automatically). Current national office-holders — Speaker, President, Vice President,
+  Chief Justice — are graded too. Anything without data falls back to self-grading.
+
+The ZIP→district map (`zip-districts.json`) is generated from the U.S. Census ZCTA-to-Congressional-District
+relationship file by a scheduled GitHub Action (`.github/workflows/update-zip-districts.yml`) and loaded
+lazily, same-origin, only when the ZIP box is used — so the main page stays lean and works offline otherwise.
+Run that workflow once (Actions tab → "Update ZIP→district data" → Run workflow) to create the file.
 - **Persistent** — all progress is stored in `localStorage`; close the tab and pick up later.
 - **Self-contained** — one `index.html`, no build step, no dependencies, works offline.
 

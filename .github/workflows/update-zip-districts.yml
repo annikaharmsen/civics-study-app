@@ -1,0 +1,35 @@
+name: Update ZIP→district data
+
+on:
+  workflow_dispatch:        # run on demand from the Actions tab
+  schedule:
+    - cron: '0 6 1 * *'     # monthly, 1st of the month
+  push:
+    paths:                  # rebuild when the generator changes
+      - 'scripts/build-zip-districts.mjs'
+      - '.github/workflows/update-zip-districts.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build zip-districts.json
+        run: node scripts/build-zip-districts.mjs
+      - name: Commit if changed
+        run: |
+          if [[ -n "$(git status --porcelain zip-districts.json)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add zip-districts.json
+            git commit -m "data: refresh ZIP→district map"
+            git push
+          else
+            echo "zip-districts.json unchanged"
+          fi
