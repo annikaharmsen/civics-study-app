@@ -37,12 +37,17 @@ async function links(u){
 }
 async function crawl(){
   const top = await links(BASE);
-  console.log('rel2020 entries:', top.filter(h => !h.startsWith('/')).join(' '));
-  const dirs = top.filter(h => /^cd\d/i.test(h)).sort().reverse();   // cd119, cd118, ...
+  console.log('rel2020 entries:', top.filter(h => !/^https?:|^\//i.test(h)).join(' '));
+  // ZCTA-to-CD lives under the source-geo folder (zcta520) or the CD folder (cd-sld).
+  const prefer = ['zcta520/', 'cd-sld/'].filter(d => top.includes(d));
+  const dirs = prefer.length ? prefer : top.filter(h => /(zcta520|cd-?sld|cd\d)\/?$/i.test(h));
   for(const d of dirs){
     const dir = BASE + (d.endsWith('/') ? d : d + '/');
     const files = await links(dir);
-    const f = files.find(h => /zcta5.*natl\.txt$/i.test(h));
+    console.log(dir, 'files:', files.filter(f => !/^https?:|^\//i.test(f)).join(' '));
+    // The CD relationship file's name contains both "zcta5" and "cd".
+    const f = files.find(h => /zcta5.*cd.*natl\.txt$/i.test(h))
+           || files.find(h => /zcta5.*cd.*\.txt$/i.test(h));
     if(f){ const t = await tryUrl(dir + f.replace(/^.*\//, '')); if(t) return t; }
   }
   return null;
